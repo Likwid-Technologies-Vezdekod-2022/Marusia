@@ -116,17 +116,11 @@ class MarusiaCommandsView(APIView):
             }
         if fuzz.ratio(data['request']['command'], 'Опросник') > 70:
             response['response'] = {
-                'text': QUESTIONS[0]['question'],
+                'text': QUESTIONS[0]['question'] + '\n\n',
                 'end_session': False,
                 'tts': QUESTIONS[0]['question'],
                 'buttons': [],
             }
             for answer in QUESTIONS[0]['answers']:
-                response['response']['buttons'].append(
-                    {
-                        'title': answer,
-                        'payload': {},
-                        'url': 'https://marus.bolanebyla.ru/marusia/quiz'
-                    }
-                )
+                response['response']['text'] += answer + '\n'
         return Response(response, status.HTTP_200_OK)
