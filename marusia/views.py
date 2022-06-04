@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from fuzzywuzzy import fuzz
 
 
 class MarusiaCommandsView(APIView):
@@ -17,7 +18,7 @@ class MarusiaCommandsView(APIView):
             'version': '1.0',
             'session': data['session']
         }
-        if data['request']['command'].lower() == 'likwid technologies вездекод':
+        if fuzz.ratio(data['request']['command'].lower(), 'likwid technologies вездеход') > 70:
             response['response'] = {
                 'text': 'Привет вездекодерам!',
                 'tts': 'Привет вездекодерам!',
@@ -30,7 +31,7 @@ class MarusiaCommandsView(APIView):
                 # ],
                 'end_session': True
             }
-        if data['request']['command'] == 'помогите':
+        if fuzz.ratio(data['request']['command'], 'помогите') > 70:
             response['response'] = {
                 'text': 'Список команд:\nпамагите: Список команд\nlikwid technologies '
                         'вездекод: Привет вездекодерам!\nОпросник: Список последовательно задаваемых вопросов\n\n '
