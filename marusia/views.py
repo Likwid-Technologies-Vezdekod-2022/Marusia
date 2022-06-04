@@ -179,7 +179,7 @@ class MarusiaCommandsView(APIView):
                     ending = 'ов'
                 response['response'] = {
                     'tts': 'Квиз завершён',
-                    'text': f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending
+                    'text': f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending,
                     'end_session': True
                 }
         return Response(response, status.HTTP_200_OK)
