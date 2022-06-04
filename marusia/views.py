@@ -39,4 +39,8 @@ class MarusiaCommandsView(APIView):
                 'end_session': True,
                 'tts': 'Список команд выведен'
             }
+        if fuzz.ratio(data['request']['command'], 'Опросник') > 70:
+            response['response'] = {
+                'text': 'indev'
+            }
         return Response(response, status.HTTP_200_OK)
