@@ -125,7 +125,7 @@ class MarusiaCommandsView(APIView):
                 response['response']['buttons'].append(
                     {
                         'title': answer,
-                        'payload': QUESTIONS[0]['answers'][answer],
+                        'payload': {},
                         'url': 'https://marus.bolanebyla.ru/marusia/quiz'
                     }
                 )
