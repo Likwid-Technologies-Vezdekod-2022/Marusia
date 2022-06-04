@@ -177,9 +177,16 @@ class MarusiaCommandsView(APIView):
                     ending = 'а'
                 else:
                     ending = 'ов'
+                text = f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending + '\n\n'
+                if state["result_counter"] >= 4:
+                    text += 'Вы правельно ответили на большую чать вопросов, соответственно вы знакомы с большей ' \
+                            'частью котегорий, рекомендуем вам поучаствовать во всех '
+                else:
+                    text += 'Вы не справились с большенством вопросов, рекомендоуем вам по больше учиться и ' \
+                            'выберать те котегории, в которых вы чуствуете себя уверенно '
                 response['response'] = {
-                    'tts': f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending,
-                    'text': f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending,
+                    'tts': text,
+                    'text': text,
                     'end_session': True
                 }
         return Response(response, status.HTTP_200_OK)
