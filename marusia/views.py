@@ -131,6 +131,10 @@ class MarusiaCommandsView(APIView):
                 'ssml': f"<?xml version =\"1.0\" encoding=\"UTF-8\"?><speak version=\"1.1\" xmlns:mailru=\"["
                         f"http://vc.go.mail.ru]\" lang=\"ru\"><s>{QUESTIONS[0]['question']}</s><break time=\"1.00s\"/> "
                         f"<speaker audio=\"marusia-sounds/things-bell-1\"/>",
+                "card": {
+                    "type": "BigImage",
+                    "image_id": 239017
+                },
             }
             response['response']['text'] += self.get_answers(0)
             response['session_state']['prev_question'] = 0
