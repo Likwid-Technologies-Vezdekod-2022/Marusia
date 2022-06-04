@@ -167,4 +167,5 @@ class MarusiaCommandsView(APIView):
                 'end_session': False,
                 'session_state': state
             }
+            print(state)
         return Response(response, status.HTTP_200_OK)
