@@ -181,13 +181,16 @@ class MarusiaCommandsView(APIView):
                 'end_session': True,
                 "commands": [
                     {
-                        "type": "MiniApp",
-                        "url": ["https://vk.com/app7543093"]
+                        "type": "BigImage",
+                        "image_id": 457239019
                     },
-                    # {
-                    #     "type": "BigImage",
-                    #     "image_id": 457239019
-                    # }
+                    {
+                        "type": "Link",
+                        "url": ["https://vk.com/app7923597"],
+                        "title": " VK Lessons",
+                        "text": " VK Lessons",
+                        "image_id": 457239020
+                    }
                 ],
             }
         return self.response
