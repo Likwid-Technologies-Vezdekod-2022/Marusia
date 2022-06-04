@@ -186,7 +186,7 @@ class MarusiaCommandsView(APIView):
                     },
                     {
                         "type": "Link",
-                        "url": "[https://vk.com/app7923597"],
+                        "url": ["https://vk.com/app7923597"],
                         "title": " VK Lessons",
                         "text": " VK Lessons",
                         "image_id": 457239020
