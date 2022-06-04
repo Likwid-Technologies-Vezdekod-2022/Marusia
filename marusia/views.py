@@ -129,7 +129,7 @@ class MarusiaCommandsView(APIView):
                 'text': QUESTIONS[0]['question'] + '\n\n',
                 'end_session': False,
                 'tts_type': 'ssml',
-                'tts': f"<?xml version =\"1.0\" encoding=\"UTF-8\"?><speak version=\"1.1\" xmlns:mailru=\"["
+                'ssml': f"<?xml version =\"1.0\" encoding=\"UTF-8\"?><speak version=\"1.1\" xmlns:mailru=\"["
                        f"http://vc.go.mail.ru]\" lang=\"ru\"><s>{QUESTIONS[0]['question']}<break time=\"1.00s\"/></s> "
                        f"<speaker audio=\"marusia-sounds/things-bell-1\"/>",
             }
