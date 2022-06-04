@@ -91,7 +91,8 @@ class MarusiaCommandsView(APIView):
                 'end_session': True
             },
             'version': '1.0',
-            'session': data['session']
+            'session': data['session'],
+            'state': data['state']
         }
         if fuzz.ratio(data['request']['command'].lower(), 'likwid technologies вездеход') > 70:
             response['response'] = {
@@ -125,4 +126,5 @@ class MarusiaCommandsView(APIView):
             for answer in QUESTIONS[0]['answers']:
                 counter += 1
                 response['response']['text'] += f'{counter}) {answer} \n\n'
+            response['state']['session']['prev_question'] = 0
         return Response(response, status.HTTP_200_OK)
