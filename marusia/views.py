@@ -148,25 +148,38 @@ class MarusiaCommandsView(APIView):
                 return Response(response, status.HTTP_200_OK)
             answers = QUESTIONS[state['prev_question']]['answers']
             if 1 <= answer <= len(answers):
-                print(answers)
-                if answers[answer][1]:
+                if answers[answer-1][1]:
                     text = 'Правельный ответ!'
                     state['result_counter'] += 1
                 else:
                     text = 'Непрвельно'
-                text += '\n\n' + QUESTIONS[state['prev_question']+1]['question']
-                tts = text
-                text += ' \n\n' + self.get_answers(state['prev_question']+1)
+                try:
+                    text += '\n\n' + QUESTIONS[state['prev_question']+1]['question']
+                    tts = text
+                    text += ' \n\n' + self.get_answers(state['prev_question']+1)
+                except: pass
                 state['prev_question'] += 1
             else:
                 text = f'ты видимо не справился с кнопкой, попробуй ещё раз'
                 tts = text
                 text += self.get_answers(state['prev_question'])
-            response['response'] = {
-                'tts': tts,
-                'text': text,
-                'end_session': False,
-                'session_state': state
-            }
-            print(state)
+            if state['prev_question'] < 8:
+                response['response'] = {
+                    'tts': tts,
+                    'text': text,
+                    'end_session': False,
+                }
+                response['session_state'] = state
+            else:
+                if state["result_counter"] == 1:
+                    ending = 'о'
+                elif 5 > state["result_counter"] > 1:
+                    ending = 'а'
+                else:
+                    ending = 'ов'
+                response['response'] = {
+                    'tts': 'Квиз завершён',
+                    'text': f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending
+                    'end_session': True
+                }
         return Response(response, status.HTTP_200_OK)
