@@ -184,10 +184,10 @@ class MarusiaCommandsView(APIView):
                         "type": "MiniApp",
                         "url": ["https://vk.com/app7543093"]
                     },
-                    {
-                        "type": "BigImage",
-                        "image_id": 457239019
-                    }
+                    # {
+                    #     "type": "BigImage",
+                    #     "image_id": 457239019
+                    # }
                 ],
             }
         return self.response
