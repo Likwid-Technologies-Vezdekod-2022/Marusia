@@ -4,11 +4,11 @@ from rest_framework import status
 
 
 class MarusiaCommandsView(APIView):
-    def get(self, request):
+    def post(self, request):
         data = request.data
         response = {
             'response': {
-                'text': 'Неизвестная команда\nСписок команд:\nпамагите: Список команд\nlikwid technologies '
+                'text': 'Неизвестная команда\nСписок команд:\nпомогите: Список команд\nlikwid technologies '
                         'вездекод: Привет вездекодерам!\nОпросник: Список последовательно задаваемых вопросов\n\n '
                         'Команды работают с любым регистром',
                 'tts': 'неизвестная команда',
@@ -30,7 +30,7 @@ class MarusiaCommandsView(APIView):
                 # ],
                 'end_session': True
             }
-        if data['request']['command'] == 'памагите':
+        if data['request']['command'] == 'помогите':
             response['response'] = {
                 'text': 'Список команд:\nпамагите: Список команд\nlikwid technologies '
                         'вездекод: Привет вездекодерам!\nОпросник: Список последовательно задаваемых вопросов\n\n '
