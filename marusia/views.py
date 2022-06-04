@@ -87,10 +87,105 @@ class MarusiaCommandsView(APIView):
             text += f'{counter}) {answer[0]} \n\n'
         return text
 
+    def _help(self):
+        self.response['response'] = {
+                'text': 'Список команд:\nпамагите: Список команд\nlikwid technologies '
+                        'вездекод: Привет вездекодерам!\nОпросник: Список последовательно задаваемых вопросов\n\n '
+                        'Команды работают с любым регистром',
+                'end_session': True,
+                'tts': 'Список команд выведен'
+            }
+
+        return self.response
+
+    def _hello(self):
+        self.response['response'] = {
+            'text': 'Привет вездекодерам!',
+            'tts': 'Привет вездекодерам!',
+            'end_session': True
+        }
+        return self.response
+
+    def _quiz_start(self):
+        self.response['response'] = {
+            'text': QUESTIONS[0]['question'] + '\n\n',
+            'end_session': False,
+            'tts': f"<?xml version =\"1.0\" encoding=\"UTF-8\"?><speak version=\"1.1\" xmlns:mailru=\"["
+                   f"http://vc.go.mail.ru]\" lang=\"ru\"><s>{QUESTIONS[0]['question']}</s><break time=\"1.00s\"/>"
+                   f"<speaker audio=\"marusia-sounds/things-bell-1\"/>",
+            "card": {
+                "type": "BigImage",
+                "image_id": 457239018
+            },
+        }
+        self.response['response']['text'] += self.get_answers(0)
+        self.response['session_state']['prev_question'] = 0
+        self.response['session_state']['result_counter'] = 0
+        return self.response
+
+    def _quiz(self):
+        try:
+            answer = int(data['request']['command'])
+        except:
+            text = 'ты видимо не справился с кнопкой, попробуй ещё раз, вводить надо цифры'
+            tts = text
+            self.response['response'] = {
+                'tts': tts,
+                'text': text,
+                'end_session': False,
+            }
+            self.response['session_state'] = self.state
+            return self.response
+        answers = QUESTIONS[self.state['prev_question']]['answers']
+        if 1 <= answer <= len(answers):
+            if answers[answer - 1][1]:
+                text = 'Правельный ответ!'
+                self.state['result_counter'] += 1
+            else:
+                text = 'Неправельно'
+            try:
+                text += '\n\n' + QUESTIONS[self.state['prev_question'] + 1]['question']
+                tts = text
+                text += ' \n\n' + self.get_answers(self.state['prev_question'] + 1)
+            except:
+                pass
+            self.state['prev_question'] += 1
+        else:
+            text = f'ты видимо не справился с кнопкой, попробуй ещё раз \n\n'
+            tts = text
+            text += self.get_answers(self.state['prev_question'])
+        if self.state['prev_question'] < 8:
+            self.response['response'] = {
+                'tts': tts + '<break time=\"1.00s\"/><speaker audio=\"marusia-sounds/things-bell-1\"/>',
+                'text': text,
+                'end_session': False,
+            }
+            self.response['session_state'] = self.state
+        else:
+            if self.state["result_counter"] == 1:
+                ending = 'о'
+            elif 5 > self.state["result_counter"] > 1:
+                ending = 'а'
+            else:
+                ending = 'ов'
+            text = f'Квиз завершён, вы набрали {self.state["result_counter"]} очк' + ending + '\n\n'
+            if self.state["result_counter"] >= 4:
+                text += 'Вы правельно ответили на большую чать вопросов, соответственно вы знакомы с большей ' \
+                        'частью котегорий, рекомендуем вам поучаствовать во всех '
+            else:
+                text += 'Вы не справились с большенством вопросов, рекомендоуем вам по больше учиться и ' \
+                        'выберать те котегории, в которых вы чуствуете себя уверенно '
+            self.response['response'] = {
+                'tts': text + '<break time=\"1.00s\"/><speaker audio=\"marusia-sounds/things-bell-1\"/>',
+                'text': text,
+                'end_session': True
+            }
+        return self.response
+
     def post(self, request):
         data = request.data
-        state = data['state']['session']
-        response = {
+        self.state = data['state']['session']
+        self.response = {
             'response': {
                 'text': 'Неизвестная команда\nСписок команд:\nпомогите: Список команд\nlikwid technologies '
                         'вездекод: Привет вездекодерам!\nОпросник: Список последовательно задаваемых вопросов\n\n '
@@ -102,97 +197,14 @@ class MarusiaCommandsView(APIView):
             'session': data['session'],
             'session_state': {}
         }
-        if fuzz.ratio(data['request']['command'].lower(), 'likwid technologies вездеход') > 70:
-            response['response'] = {
-                'text': 'Привет вездекодерам!',
-                'tts': 'Привет вездекодерам!',
-                # 'buttons': [
-                #   {
-                #     'title': 'Надпись на кнопке',
-                #     'payload': {},
-                #     'url': 'https://example.com/'
-                #   }
-                # ],
-                'end_session': True
-            }
-        if fuzz.ratio(data['request']['command'], 'помогите') > 70:
-            response['response'] = {
-                'text': 'Список команд:\nпамагите: Список команд\nlikwid technologies '
-                        'вездекод: Привет вездекодерам!\nОпросник: Список последовательно задаваемых вопросов\n\n '
-                        'Команды работают с любым регистром',
-                'end_session': True,
-                'tts': 'Список команд выведен'
-            }
-        if fuzz.ratio(data['request']['command'], 'Опросник') > 70:
-            response['response'] = {
-                'text': QUESTIONS[0]['question'] + '\n\n',
-                'end_session': False,
-                'tts': f"<?xml version =\"1.0\" encoding=\"UTF-8\"?><speak version=\"1.1\" xmlns:mailru=\"["
-                       f"http://vc.go.mail.ru]\" lang=\"ru\"><s>{QUESTIONS[0]['question']}</s><break time=\"1.00s\"/>"
-                       f"<speaker audio=\"marusia-sounds/things-bell-1\"/>",
-                "card": {
-                    "type": "BigImage",
-                    "image_id": 457239018
-                },
-            }
-            response['response']['text'] += self.get_answers(0)
-            response['session_state']['prev_question'] = 0
-            response['session_state']['result_counter'] = 0
-        if 'prev_question' in state:
-            try:
-                answer = int(data['request']['command'])
-            except:
-                text = 'ты видимо не справился с кнопкой, попробуй ещё раз, вводить надо цифры'
-                tts = text
-                response['response'] = {
-                    'tts': tts,
-                    'text': text,
-                    'end_session': False,
-                }
-                response['session_state'] = state
-                return Response(response, status.HTTP_200_OK)
-            answers = QUESTIONS[state['prev_question']]['answers']
-            if 1 <= answer <= len(answers):
-                if answers[answer - 1][1]:
-                    text = 'Правельный ответ!'
-                    state['result_counter'] += 1
-                else:
-                    text = 'Неправельно'
-                try:
-                    text += '\n\n' + QUESTIONS[state['prev_question'] + 1]['question']
-                    tts = text
-                    text += ' \n\n' + self.get_answers(state['prev_question'] + 1)
-                except:
-                    pass
-                state['prev_question'] += 1
-            else:
-                text = f'ты видимо не справился с кнопкой, попробуй ещё раз \n\n'
-                tts = text
-                text += self.get_answers(state['prev_question'])
-            if state['prev_question'] < 8:
-                response['response'] = {
-                    'tts': tts,
-                    'text': text,
-                    'end_session': False,
-                }
-                response['session_state'] = state
-            else:
-                if state["result_counter"] == 1:
-                    ending = 'о'
-                elif 5 > state["result_counter"] > 1:
-                    ending = 'а'
-                else:
-                    ending = 'ов'
-                text = f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending + '\n\n'
-                if state["result_counter"] >= 4:
-                    text += 'Вы правельно ответили на большую чать вопросов, соответственно вы знакомы с большей ' \
-                            'частью котегорий, рекомендуем вам поучаствовать во всех '
-                else:
-                    text += 'Вы не справились с большенством вопросов, рекомендоуем вам по больше учиться и ' \
-                            'выберать те котегории, в которых вы чуствуете себя уверенно '
-                response['response'] = {
-                    'tts': text,
-                    'text': text,
-                    'end_session': True
-                }
+        response = self.response
+        if fuzz.ratio(data['request']['command'].lower(), 'likwid technologies вездекод') > 70:
+            response = self._hello()
+        if fuzz.ratio(data['request']['command'].lower(), 'помогите') > 70:
+            response = self._help()
+        if fuzz.ratio(data['request']['command'].lower(), 'викторина') > 70:
+            response = self._quiz_start()
+        if 'prev_question' in self.state:
+            response = self._quiz()
+
         return Response(response, status.HTTP_200_OK)
