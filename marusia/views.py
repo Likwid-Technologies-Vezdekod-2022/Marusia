@@ -121,6 +121,8 @@ class MarusiaCommandsView(APIView):
                 'tts': QUESTIONS[0]['question'],
                 'buttons': [],
             }
+            counter = 0
             for answer in QUESTIONS[0]['answers']:
-                response['response']['text'] += answer + '\n'
+                counter += 1
+                response['response']['text'] += f'{counter}) {answer} \n\n'
         return Response(response, status.HTTP_200_OK)
