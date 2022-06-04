@@ -7,81 +7,90 @@ from fuzzywuzzy import fuzz
 QUESTIONS = [
     {
         'question': 'Что такое http 404',
-        'answers': {
-            'Кто я?': False,
-            'Ошибка говорящая, что сервер не доступен': False,
-            'Шуточная ошибка, в оригинале звучащая как You are teapot, в переводе: ты чайник': False,
-            'Страница не найдена': True,
-        }
+        'answers': [
+            ('Кто я?', False),
+            ('Ошибка говорящая, что сервер не доступен', False),
+            ('Шуточная ошибка, в оригинале звучащая как You are teapot, в переводе: ты чайник', False),
+            ('Страница не найдена', True),
+        ]
     },
     {
         'question': 'Как в питоне разделить строку',
-        'answers': {
-            'На ноль конечно': False,
-            'Использовать встроенноую фукнцию split': False,
-            'Использовать строковый метод split': True,
-            'Использовать строковый метод div': False,
-        }
+        'answers': [
+            ('На ноль конечно', False),
+            ('Использовать встроенноую фукнцию split', False),
+            ('Использовать строковый метод split', True),
+            ('Использовать строковый метод div', False),
+        ]
     },
     {
         'question': 'Какой линукс чаще всего используется для работы в области систесмной безопасности?',
-        'answers': {
-            'Windows 95': False,
-            'kali': True,
-            'ubuntu': False,
-            'Arch': False,
-        }
+        'answers': [
+            ('Windows 95', False),
+            ('kali', True),
+            ('ubuntu', False),
+            ('Arch', False),
+        ]
     },
     {
         'question': 'Открыто ли api у телеграма?',
-        'answers': {
-            'Кто такой api?': False,
-            'Да': True,
-            'Нет': False,
-        }
+        'answers': [
+            ('Кто такой api?', False),
+            ('Да', True),
+            ('Нет', False),
+        ]
     },
     {
         'question': 'Что на js выдаст программа: \'2\'+\'2\'-\'2\'',
-        'answers': {
-            'Исключение': False,
-            '2': False,
-            '20': True,
-            '-infinity': False,
-        }
+        'answers': [
+            ('Исключение', False),
+            ('2', False),
+            ('20', True),
+            ('-infinity', False),
+        ]
     },
     {
         'question': 'Что такое XR',
-        'answers': {
-            'Второе название для HR': False,
-            'Дополненая реальность': True,
-            'Нееронные сети': False,
-            'Мобильная разработка': False,
-        }
+        'answers': [
+            ('Второе название для HR', False),
+            ('Дополненая реальность', True),
+            ('Нееронные сети', False),
+            ('Мобильная разработка', False),
+        ]
     },
     {
         'question': 'Самый популярный язык для мобильной разработки в 2007',
-        'answers': {
-            'Python 3.10': False,
-            'Kotlin': False,
-            'Java': True,
-            'Unity': False,
-        }
+        'answers': [
+            ('Python 3.10', False),
+            ('Kotlin', False),
+            ('Java', True),
+            ('Unity', False),
+        ]
     },
     {
         'question': 'На каком голосовом помошнике ты проходишь этот квиз?',
-        'answers': {
-            'Джарвис': False,
-            'Алиса': False,
-            'Гоша Дударь': False,
-            'Маруся': True,
-        }
+        'answers': [
+            ('Джарвис', False),
+            ('Алиса', False),
+            ('Гоша Дударь', False),
+            ('Маруся', True),
+        ]
     },
 ]
 
 
 class MarusiaCommandsView(APIView):
+    def get_answers(self, question):
+        text = ''
+        counter = 0
+        for answer in QUESTIONS[question]['answers']:
+            counter += 1
+            text += f'{counter}) {answer[0]} \n\n'
+        return text
+
     def post(self, request):
         data = request.data
+        state = data['state']['session']
         response = {
             'response': {
                 'text': 'Неизвестная команда\nСписок команд:\nпомогите: Список команд\nlikwid technologies '
@@ -121,9 +130,40 @@ class MarusiaCommandsView(APIView):
                 'end_session': False,
                 'tts': QUESTIONS[0]['question'],
             }
-            counter = 0
-            for answer in QUESTIONS[0]['answers']:
-                counter += 1
-                response['response']['text'] += f'{counter}) {answer} \n\n'
+            response['response']['text'] += self.get_answers(0)
             response['session_state']['prev_question'] = 0
+            response['session_state']['result_counter'] = 0
+        if 'prev_question' in state:
+            try:
+                answer = int(data['request']['command'])
+            except:
+                text = 'ты видимо не справился с кнопкой, попробуй ещё раз, вводить надо цифры'
+                tts = text
+                response['response'] = {
+                    'tts': tts,
+                    'text': text,
+                    'end_session': False,
+                    'session_state': state
+                }
+                return Response(response, status.HTTP_200_OK)
+            answers = QUESTIONS[state['prev_question']]['answers']
+            if 1 <= answer <= len(answers):
+                if answers[answer]:
+                    text = 'Правельный ответ!'
+                    state['result_counter'] += 1
+                else:
+                    text = 'Непрвельно'
+                tts = text
+                text += ' \n\n' + self.get_answers(state['prev_question']+1)
+                state['prev_question'] += 1
+            else:
+                text = f'ты видимо не справился с кнопкой, попробуй ещё раз'
+                tts = text
+                text += self.get_answers(state['prev_question'])
+            response['response'] = {
+                'tts': tts,
+                'text': text,
+                'end_session': state['prev_question'],
+                'session_state': state
+            }
         return Response(response, status.HTTP_200_OK)
