@@ -133,7 +133,7 @@ class MarusiaCommandsView(APIView):
                         f"<speaker audio=\"marusia-sounds/things-bell-1\"/>",
                 "card": {
                     "type": "BigImage",
-                    "image_id": 239017
+                    "image_id": 457239018
                 },
             }
             response['response']['text'] += self.get_answers(0)
