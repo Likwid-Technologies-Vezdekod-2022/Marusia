@@ -123,7 +123,7 @@ class MarusiaCommandsView(APIView):
         self.response['session_state']['result_counter'] = 0
         return self.response
 
-    def _quiz(self):
+    def _quiz(self, data):
         try:
             answer = int(data['request']['command'])
         except:
@@ -215,6 +215,6 @@ class MarusiaCommandsView(APIView):
         if fuzz.ratio(data['request']['command'].lower(), 'викторина') > 70:
             response = self._quiz_start()
         if 'prev_question' in self.state:
-            response = self._quiz()
+            response = self._quiz(data)
 
         return Response(response, status.HTTP_200_OK)
