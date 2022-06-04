@@ -153,6 +153,7 @@ class MarusiaCommandsView(APIView):
                     state['result_counter'] += 1
                 else:
                     text = 'Непрвельно'
+                text += '\n\n' + QUESTIONS[state['prev_question']+1]['question']
                 tts = text
                 text += ' \n\n' + self.get_answers(state['prev_question']+1)
                 state['prev_question'] += 1
@@ -163,7 +164,7 @@ class MarusiaCommandsView(APIView):
             response['response'] = {
                 'tts': tts,
                 'text': text,
-                'end_session': state['prev_question'],
+                'end_session': False,
                 'session_state': state
             }
         return Response(response, status.HTTP_200_OK)
