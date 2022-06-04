@@ -152,7 +152,7 @@ class MarusiaCommandsView(APIView):
                     text = 'Правельный ответ!'
                     state['result_counter'] += 1
                 else:
-                    text = 'Непрвально'
+                    text = 'Неправельно'
                 try:
                     text += '\n\n' + QUESTIONS[state['prev_question']+1]['question']
                     tts = text
