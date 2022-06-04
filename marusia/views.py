@@ -148,7 +148,7 @@ class MarusiaCommandsView(APIView):
                 return Response(response, status.HTTP_200_OK)
             answers = QUESTIONS[state['prev_question']]['answers']
             if 1 <= answer <= len(answers):
-                print(answers[answer])
+                print(answers)
                 if answers[answer][1]:
                     text = 'Правельный ответ!'
                     state['result_counter'] += 1
