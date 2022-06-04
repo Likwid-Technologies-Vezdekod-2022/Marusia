@@ -178,7 +178,17 @@ class MarusiaCommandsView(APIView):
             self.response['response'] = {
                 'tts': text + '<break time=\"1.00s\"/><speaker audio=\"marusia-sounds/things-bell-1\"/>',
                 'text': text,
-                'end_session': True
+                'end_session': True,
+                "commands": [
+                    {
+                        "type": "MiniApp",
+                        "url": ["https://vk.com/app7543093"]
+                    },
+                    {
+                        "type": "BigImage",
+                        "image_id": 457239019
+                    }
+                ],
             }
         return self.response
 
