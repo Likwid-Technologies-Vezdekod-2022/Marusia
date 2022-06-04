@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework import status
 from fuzzywuzzy import fuzz
 
-
 QUESTIONS = [
     {
         'question': 'Что такое http 404',
@@ -130,8 +129,8 @@ class MarusiaCommandsView(APIView):
                 'end_session': False,
                 'tts_type': 'ssml',
                 'ssml': f"<?xml version =\"1.0\" encoding=\"UTF-8\"?><speak version=\"1.1\" xmlns:mailru=\"["
-                       f"http://vc.go.mail.ru]\" lang=\"ru\"><s>{QUESTIONS[0]['question']}<break time=\"1.00s\"/></s> "
-                       f"<speaker audio=\"marusia-sounds/things-bell-1\"/>",
+                        f"http://vc.go.mail.ru]\" lang=\"ru\"><s>{QUESTIONS[0]['question']}</s><break time=\"1.00s\"/> "
+                        f"<speaker audio=\"marusia-sounds/things-bell-1\"/>",
             }
             response['response']['text'] += self.get_answers(0)
             response['session_state']['prev_question'] = 0
@@ -151,16 +150,17 @@ class MarusiaCommandsView(APIView):
                 return Response(response, status.HTTP_200_OK)
             answers = QUESTIONS[state['prev_question']]['answers']
             if 1 <= answer <= len(answers):
-                if answers[answer-1][1]:
+                if answers[answer - 1][1]:
                     text = 'Правельный ответ!'
                     state['result_counter'] += 1
                 else:
                     text = 'Неправельно'
                 try:
-                    text += '\n\n' + QUESTIONS[state['prev_question']+1]['question']
+                    text += '\n\n' + QUESTIONS[state['prev_question'] + 1]['question']
                     tts = text
-                    text += ' \n\n' + self.get_answers(state['prev_question']+1)
-                except: pass
+                    text += ' \n\n' + self.get_answers(state['prev_question'] + 1)
+                except:
+                    pass
                 state['prev_question'] += 1
             else:
                 text = f'ты видимо не справился с кнопкой, попробуй ещё раз \n\n'
