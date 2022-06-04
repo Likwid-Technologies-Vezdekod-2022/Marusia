@@ -143,8 +143,8 @@ class MarusiaCommandsView(APIView):
                     'tts': tts,
                     'text': text,
                     'end_session': False,
-                    'session_state': state
                 }
+                response['session_state'] = state
                 return Response(response, status.HTTP_200_OK)
             answers = QUESTIONS[state['prev_question']]['answers']
             if 1 <= answer <= len(answers):
