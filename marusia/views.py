@@ -121,11 +121,11 @@ class MarusiaCommandsView(APIView):
                 'tts': QUESTIONS[0]['question'],
                 'buttons': [],
             }
-            for answer, result in QUESTIONS[0]['answers']:
+            for answer in QUESTIONS[0]['answers']:
                 response['response']['buttons'].append(
                     {
                         'title': answer,
-                        'payload': result,
+                        'payload': QUESTIONS[0]['answers'][answer],
                         'url': 'https://marus.bolanebyla.ru/marusia/quiz'
                     }
                 )
