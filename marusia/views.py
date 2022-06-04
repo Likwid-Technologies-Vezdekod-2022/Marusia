@@ -160,7 +160,7 @@ class MarusiaCommandsView(APIView):
                 except: pass
                 state['prev_question'] += 1
             else:
-                text = f'ты видимо не справился с кнопкой, попробуй ещё раз'
+                text = f'ты видимо не справился с кнопкой, попробуй ещё раз \n\n'
                 tts = text
                 text += self.get_answers(state['prev_question'])
             if state['prev_question'] < 8:
@@ -178,7 +178,7 @@ class MarusiaCommandsView(APIView):
                 else:
                     ending = 'ов'
                 response['response'] = {
-                    'tts': 'Квиз завершён',
+                    'tts': f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending,
                     'text': f'Квиз завершён, вы набрали {state["result_counter"]} очк' + ending,
                     'end_session': True
                 }
